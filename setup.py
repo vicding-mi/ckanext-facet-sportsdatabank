@@ -80,10 +80,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points='''
         [ckan.plugins]
-        facet = ckanext.facet.plugin:FacetPlugin
-
-        [babel.extractors]
-        ckan = ckan.lib.extract:extract_ckan
+        custom_facet=ckanext.facet.plugin:FacetPlugin
     ''',
 
     # If you are changing from the default layout of your extension, you may
