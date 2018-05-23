@@ -21,10 +21,9 @@ class FacetPlugin(plugins.SingletonPlugin):
         if 'groups' in facets_dict:
             facets_dict['groups'] = 'Communities'
         # New facets
-        facets_dict['author'] = toolkit._('Author')
-        facets_dict['extras_Discipline'] = toolkit._('Discipline')
-        facets_dict['extras_Language'] = toolkit._('Language')
-        facets_dict['extras_Origin'] = toolkit._('Origin')
-        facets_dict['extras_PublicationYear'] = toolkit._('Publication Year')
-        facets_dict['narrator'] = toolkit._('Narrator')
+        facets_dict['identifier'] = toolkit._('Identifier')
+        facets_dict['index'] = toolkit._('Index')
+        facets_dict['keyword'] = toolkit._('Keyword')
+        facets_dict['placeMentioned'] = toolkit._('Place Mentioned')
+        facets_dict['placeOfNarration'] = toolkit._('Place Of Narration')
         return facets_dict
