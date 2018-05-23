@@ -11,6 +11,10 @@ class FacetPlugin(plugins.SingletonPlugin):
     def dataset_facets(self, facets_dict, package_type):
         return self._facets(facets_dict)
 
+    def organization_facets(self, facets_dict, organization_type,
+                            package_type):
+        return self._facets(facets_dict)
+    
     def _facets(self, facets_dict):
         # Deleted facets
         if 'license_id' in facets_dict:
