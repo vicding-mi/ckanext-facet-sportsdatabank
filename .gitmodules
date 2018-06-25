@@ -1,0 +1,3 @@
+[submodule "ckanext-facet"]
+	path = ckanext-facet
+	url = git@github.com:vicding-mi/ckanext-facet.git
