@@ -26,6 +26,7 @@ class FacetPlugin(plugins.SingletonPlugin):
         if 'groups' in facets_dict:
             facets_dict['groups'] = 'Communities'
         # New facets
+        # facets_dict['spatial'] = toolkit._('Spatial')
         facets_dict['identifier'] = toolkit._('Identifier')
         facets_dict['index'] = toolkit._('Index')
         facets_dict['keyword'] = toolkit._('Keyword')
