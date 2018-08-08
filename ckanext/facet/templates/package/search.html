@@ -23,15 +23,12 @@
     {% for r in c.page.items %}
         {% for spatial in r['extras'] %}
             {% if spatial['key'] == 'spatial' %}
-                {% set beg = spatial['value'].find('[') %}
-                {% set end = spatial['value'].find(']') %}
-                // <div>{{spatial['value']}}: {{spatial['value'][beg+1:end]}}</div>
-                {% set seperator = spatial['value'][beg+1:end].find(',') %}
-                {% set lat = spatial['value'][beg+1:end][:seperator] %}
-                {% set lon = spatial['value'][beg+1:end][seperator+1:] %}
-                // <div>coordinates: {{lon}}, {{lat}}</div>
-                var marker = L.marker([{{lon}}, {{lat}}]).addTo(mymap);
+                {% set markers = h.facet_loadjson(spatial['value']) %}
+                {% for marker in markers['coordinates'] %}
+                    var marker = L.marker({{ marker }}).addTo(mymap);
+                {% endfor %}
             {% endif %}
+
         {% endfor %}
     {% endfor %}
     </script>
