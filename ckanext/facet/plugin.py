@@ -3,6 +3,7 @@ import ckan.plugins.toolkit as toolkit
 import logging
 import json
 import urllib2
+from pprint import pprint
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +33,14 @@ def facet_apisearch(q='', rows=999999):
     assert response_dict['success'] is True
     return response_dict['result']
 
+def facet_pprint(obj):
+    pprint(obj)
+
+def facet_len(obj):
+    return len(obj)
+
+def facet_vars(obj):
+    return vars(obj)
 
 class FacetPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IFacets)
@@ -79,6 +88,7 @@ class FacetPlugin(plugins.SingletonPlugin):
         # 'templates' is the path to the templates dir, relative to this
         # plugin.py file.
         toolkit.add_template_directory(config, 'templates')
+        toolkit.add_resource('fanstatic', 'general.css')
 
     def get_helpers(self):
         '''Register the most_popular_groups() function above as a template
@@ -88,4 +98,6 @@ class FacetPlugin(plugins.SingletonPlugin):
         # Template helper function names should begin with the name of the
         # extension they belong to, to avoid clashing with functions from
         # other extensions.
-        return {'facet_loadjson': facet_loadjson, 'facet_apisearch': facet_apisearch}
+        return {'facet_loadjson': facet_loadjson, 'facet_apisearch': facet_apisearch,
+                'facet_pprint': facet_pprint, 'facet_len': facet_len, 'facet_vars': facet_vars,
+                }
