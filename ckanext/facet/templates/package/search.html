@@ -20,7 +20,8 @@
     accessToken: 'pk.eyJ1IjoidmljZGluZy1kaSIsImEiOiJjamtjajVod28waHN5M3FxZmw4YTMwdWJxIn0.8thy3AiluSOpJrukB8p0xQ'
 }).addTo(mymap);    
 
-    {% for r in c.page.items %}
+    {# for r in c.page.items #}
+    {% for r in c.page.full_results %}
         {% for spatial in r['extras'] %}
             {% if spatial['key'] == 'spatial' %}
                 {% set markers = h.facet_loadjson(spatial['value']) %}
@@ -33,9 +34,7 @@
     {% endfor %}
     </script>
     {{ super() }}
-    {{ h.facet_vars(c) }}
-    {{ c.drill_down_url() }}
-    {{ h.url_for() }}
+
 {% endblock %}
 
 {% block secondary_content %}

@@ -47,6 +47,7 @@ class FacetPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.ITemplateHelpers)
+    plugins.implements(plugins.IRoutes, inherit=True)
 
     def dataset_facets(self, facets_dict, package_type):
         return self._facets(facets_dict)
@@ -101,3 +102,27 @@ class FacetPlugin(plugins.SingletonPlugin):
         return {'facet_loadjson': facet_loadjson, 'facet_apisearch': facet_apisearch,
                 'facet_pprint': facet_pprint, 'facet_len': facet_len, 'facet_vars': facet_vars,
                 }
+
+    def before_map(self, map):
+        """This IRoutes implementation overrides the standard
+        ``/user/register`` behaviour with a custom controller.  You
+        might instead use it to provide a completely new page, for
+        example.
+        Note that we have also provided a custom register form
+        template at ``theme/templates/user/register.html``.
+        """
+        # Hook in our custom user controller at the points of creation
+        # and edition.
+        map.connect('/dataset',
+                    controller='ckanext.facet.controller:CustomPakcageController',
+                    action='search')
+        # map.connect('/user/edit',
+        #             controller='ckanext.example.controller:CustomUserController',
+        #             action='edit')
+        # map.connect('/user/edit/{id:.*}',
+        #             controller='ckanext.example.controller:CustomUserController',
+        #             action='edit')
+
+        # map.connect('/package/new', controller='package_formalchemy', action='new')
+        # map.connect('/package/edit/{id}', controller='package_formalchemy', action='edit')
+        return map
