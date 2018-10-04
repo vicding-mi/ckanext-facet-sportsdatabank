@@ -34,6 +34,7 @@
     {% endfor %}
     </script>
     {{ super() }}
+    {{ h.facet_len(c.page.full_results) }}
 
 {% endblock %}
 

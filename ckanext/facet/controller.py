@@ -223,7 +223,7 @@ class CustomPakcageController(PackageController):
                 'q': q,
                 'fq': fq.strip(),
                 'facet.field': facets.keys(),
-                'rows': 99999999,
+                'rows': 99999,
                 'start': 0,
                 'sort': sort_by,
                 'extras': search_extras,

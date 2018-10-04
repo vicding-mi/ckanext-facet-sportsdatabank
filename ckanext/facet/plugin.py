@@ -17,7 +17,8 @@ def facet_loadjson(orgstr, swap=True):
             json_data['coordinates'] = map(lambda x: list(reversed(x)), reversed(json_data['coordinates']))
     return json_data
 
-def facet_apisearch(q='', rows=999999):
+
+def facet_apisearch(q='', rows=99999):
     request = urllib2.Request(
         'http://ckan:5000/api/3/action/package_search?q=%s&rows=%s' % (q, rows))
 
@@ -33,14 +34,22 @@ def facet_apisearch(q='', rows=999999):
     assert response_dict['success'] is True
     return response_dict['result']
 
+
 def facet_pprint(obj):
     pprint(obj)
+
 
 def facet_len(obj):
     return len(obj)
 
+
 def facet_vars(obj):
     return vars(obj)
+
+
+def facet_capitalize(string):
+    return string.capatalize
+
 
 class FacetPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IFacets)
@@ -101,6 +110,7 @@ class FacetPlugin(plugins.SingletonPlugin):
         # other extensions.
         return {'facet_loadjson': facet_loadjson, 'facet_apisearch': facet_apisearch,
                 'facet_pprint': facet_pprint, 'facet_len': facet_len, 'facet_vars': facet_vars,
+                'facet_capitalize': facet_capitalize,
                 }
 
     def before_map(self, map):
