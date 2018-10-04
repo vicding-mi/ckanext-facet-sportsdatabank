@@ -219,11 +219,18 @@ class CustomPakcageController(PackageController):
                     'ckan.search.default_include_private', True)),
             }
 
+            query = get_action('package_search')(context, data_dict)
+
+            # loop the search query and get all the results
+            # this workaround the 1000 rows solr hard limit
+            HARD_LIMIT = 1000
+            pager = 0
+
             data_dict_full_result = {
                 'q': q,
                 'fq': fq.strip(),
                 'facet.field': facets.keys(),
-                'rows': 99999,
+                'rows': HARD_LIMIT,
                 'start': 0,
                 'sort': sort_by,
                 'extras': search_extras,
@@ -231,8 +238,27 @@ class CustomPakcageController(PackageController):
                     'ckan.search.default_include_private', True)),
             }
 
-            query = get_action('package_search')(context, data_dict)
             query_full_result = get_action('package_search')(context, data_dict_full_result)
+
+            full_results = list()
+            while query_full_result.get('results', None) and pager < 10:
+                full_results.extend(query_full_result.get('results', None))
+
+                pager += 1
+
+                data_dict_full_result = {
+                    'q': q,
+                    'fq': fq.strip(),
+                    'facet.field': facets.keys(),
+                    'rows': HARD_LIMIT,
+                    'start': pager * HARD_LIMIT,
+                    'sort': sort_by,
+                    'extras': search_extras,
+                    'include_private': asbool(config.get(
+                        'ckan.search.default_include_private', True)),
+                }
+
+                query_full_result = get_action('package_search')(context, data_dict_full_result)
 
             c.sort_by_selected = query['sort']
 
@@ -245,7 +271,7 @@ class CustomPakcageController(PackageController):
             )
             c.search_facets = query['search_facets']
             c.page.items = query['results']
-            c.page.full_results = query_full_result['results']
+            c.page.full_results = full_results
         except SearchQueryError as se:
             # User's search parameters are invalid, in such a way that is not
             # achievable with the web interface, so return a proper error to
