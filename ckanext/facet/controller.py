@@ -224,6 +224,17 @@ class CustomPakcageController(PackageController):
             # loop the search query and get all the results
             # this workaround the 1000 rows solr hard limit
             HARD_LIMIT = 1000
+
+            # pager limit is to control the total geo points which are going to be plotted
+            # this is a performance tuner rather than actual limit
+            # Loading 1k to 3k points seems performant
+            # More than that will pose a problem at both server and client side
+            # On the server, it has to loop through all the points
+            # And on the client, javascript has to do all the acutal plot
+            if q:
+                PAGER_LIMIT = 10
+            else:
+                PAGER_LIMIT = 1
             pager = 0
 
             data_dict_full_result = {
@@ -241,7 +252,7 @@ class CustomPakcageController(PackageController):
             query_full_result = get_action('package_search')(context, data_dict_full_result)
 
             full_results = list()
-            while query_full_result.get('results', None) and pager < 10:
+            while query_full_result.get('results', None) and pager < PAGER_LIMIT:
                 full_results.extend(query_full_result.get('results', None))
 
                 pager += 1
