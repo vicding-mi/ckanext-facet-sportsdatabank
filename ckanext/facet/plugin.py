@@ -98,7 +98,7 @@ class FacetPlugin(plugins.SingletonPlugin):
         # 'templates' is the path to the templates dir, relative to this
         # plugin.py file.
         toolkit.add_template_directory(config, 'templates')
-        toolkit.add_resource('fanstatic', 'general.css')
+        toolkit.add_resource('fanstatic', 'facet')
 
     def get_helpers(self):
         '''Register the most_popular_groups() function above as a template

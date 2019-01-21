@@ -235,6 +235,9 @@ class CustomPakcageController(PackageController):
                 PAGER_LIMIT = 10
             else:
                 PAGER_LIMIT = 1
+
+            # crank up the pager limit high as using points cluster for better performance
+            PAGER_LIMIT = 1000
             pager = 0
 
             data_dict_full_result = {

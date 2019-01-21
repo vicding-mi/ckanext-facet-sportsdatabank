@@ -11,10 +11,13 @@ Installation
 To install ckanext-facet for development, activate your CKAN virtualenv and
 do::
 
-    git clone https://github.com/vicding-mi/ckanext-facet.git
+    git clone git@github.com:knaw-huc/ckanext-facet.git
     cd ckanext-facet
     python setup.py install
 
-The add in ``production.ini`` in the plugin section::
+Then add in ``production.ini`` in the plugin section::
 
-    ``facet``
+    ```facet```
+
+test::
+`aa`
