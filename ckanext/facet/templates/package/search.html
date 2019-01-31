@@ -15,17 +15,8 @@
     <script type="text/javascript">
 
         var geosArray = [];
-        {# for r in c.page.items #}
-        {% for r in c.page.full_results %}
-            {% for spatial in r['extras'] %}
-                {% if spatial['key'] == 'spatial' %}
-                    {% set markers = h.facet_loadjson(spatial['value']) %}
-                    {% for geopoint in markers['coordinates'] %}
-                        geosArray.push([{{ geopoint[0] }}, {{ geopoint[1] }}, "{{r['name']}}"]);
-                    {% endfor %}
-                {% endif %}
-
-            {% endfor %}
+        {% for r in map_results %}
+            geosArray.push([{{ r[0] }}, {{ r[1] }}, "{{r[2]}}", "{{r[3]}}"]);
         {% endfor %}
 
         var tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -42,17 +33,25 @@
 
         for (var i = 0; i < geosArray.length; i++) {
                 var a = geosArray[i];
-                var title = a[2];
+                var title = "<a href=\"" + a[3] + "\">"+a[2]+"</a>";
+                // var title = a[2];
                 var marker = L.marker(new L.LatLng(a[0], a[1]), { title: title });
                 marker.bindPopup(title);
                 markers.addLayer(marker);
         }
 
         map.addLayer(markers);
+        geosArray = null;
+        markers = null;
+        window.onbeforeunload = function(){
+            map = null;
+            return null;
+        };
         </script>
 
     {{ super() }}
-    {{ h.facet_len(c.page.full_results) }}
+    {{ h.facet_len(map_results) }}
+
 
 {% endblock %}
 

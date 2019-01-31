@@ -23,7 +23,7 @@
                 <th scope="row" class="dataset-label" property="rdfs:label">{{ _('Narrator') }}</th>
                 <td class="dataset-details" property="rdf:value">{{ value }}</td>
             </tr> 
-            {% elif key == 'nl_keyword' or key == 'da_keyword' %}
+            {% elif key == 'nl_keyword' or key == 'da_keyword' or key == 'de_keyword' %}
             <tr rel="dc:relation" resource="_:extra{{ i }}">
                 <th scope="row" class="dataset-label" property="rdfs:label">{{ _('Keyword') }}</th>
                 <td class="dataset-details" property="rdf:value">{{ value }}</td>
@@ -33,7 +33,7 @@
                 <th scope="row" class="dataset-label" property="rdfs:label">{{ _('Date published') }}</th>
                 <td class="dataset-details" property="rdf:value">{{ value }}</td>
             </tr> 
-        {% elif key == 'MD5' or key == 'State' or key == 'Created' or key == 'Last Updated' or key == 'spatial' or 'location_id' in key or 'location_geopoint' in key %}
+        {% elif key == 'content' or key == 'MD5' or key == 'State' or key == 'Created' or key == 'Last Updated' or key == 'spatial' or 'location_id' in key or 'location_geopoint' in key %}
         {% else %}
             <tr rel="dc:relation" resource="_:extra{{ i }}">
                 <th scope="row" class="dataset-label" property="rdfs:label">{{ _(key) }}</th>

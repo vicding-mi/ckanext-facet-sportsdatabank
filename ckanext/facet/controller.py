@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 import logging
+import urllib2
+from pprint import pprint
 from urllib import urlencode
 import datetime
 import mimetypes
@@ -24,7 +26,7 @@ import ckan.lib.uploader as uploader
 import ckan.plugins as p
 import ckan.lib.render
 
-from ckan.common import OrderedDict, _, json, request, c, response
+from ckan.common import OrderedDict, _, json, request, c, response, g
 
 from ckan.controllers.package import PackageController
 
@@ -44,6 +46,26 @@ parse_params = logic.parse_params
 flatten_to_string_key = logic.flatten_to_string_key
 
 lookup_package_plugin = ckan.lib.plugins.lookup_package_plugin
+
+HOSTNAME = 'redis'
+# REDIS_PORT = 6379
+# REDIS_DB = 0
+
+# settings for AMQP
+EXCHANGE_TYPE = 'direct'
+EXCHANGE_NAME = 'ckan.harvest'
+
+
+def get_connection_redis():
+    log.info('### getting redis connection from host [%s]' % HOSTNAME)
+    try:
+        import redis
+    except Exception as e:
+        log.info('### cannot import redis ###')
+    try:
+        return redis.Redis(host=HOSTNAME)
+    except Exception as e:
+        log.info('### cannot get redis connection ###')
 
 
 def _encode_params(params):
@@ -66,6 +88,65 @@ def search_url(params, package_type=None):
 
 class CustomPakcageController(PackageController):
 
+    def get_full_results(self, context, data_dict_full_result, pager, PAGER_LIMIT, q, fq, facets, HARD_LIMIT, sort_by,
+                         search_extras):
+        query_full_result = get_action('package_search')(context, data_dict_full_result)
+        full_results = list()
+        while query_full_result.get('results', None) and pager < PAGER_LIMIT:
+            full_results.extend(query_full_result.get('results', None))
+            pager += 1
+            data_dict_full_result = {
+                'q': q,
+                'fq': fq.strip(),
+                'facet.field': facets.keys(),
+                'rows': HARD_LIMIT,
+                'start': pager * HARD_LIMIT,
+                'sort': sort_by,
+                'extras': search_extras,
+                'include_private': asbool(config.get(
+                    'ckan.search.default_include_private', True)),
+            }
+            query_full_result = get_action('package_search')(context, data_dict_full_result)
+        return full_results
+
+    def facet_loadjson(self, orgstr, swap=True):
+        '''return json obj'''
+        json_data = json.loads(orgstr)
+        if swap:
+            if json_data['type'] == 'Point':
+                json_data['coordinates'] = [[json_data['coordinates'][1], json_data['coordinates'][0]]]
+            else:
+                json_data['coordinates'] = map(lambda x: list(reversed(x)), reversed(json_data['coordinates']))
+        return json_data
+
+    def get_map_result(self, full_results):
+        map_results = list()
+        for r in full_results:
+            for urlDict in r['extras']:
+                if urlDict['key'] == 'identifier':
+                    current_url = urlDict['value']
+            for spatial in r['extras']:
+                if spatial['key'] == 'spatial':
+                    markers = self.facet_loadjson(spatial['value'])
+                    for geopoint in markers['coordinates']:
+                        map_results.append([geopoint[0], geopoint[1], r['name'], current_url])
+        # log.info(map_results)
+        return map_results
+
+    def get_all_packages(self, max_records=99999):
+        request = urllib2.Request('http://ckan:5000/api/3/action/package_search?q=*:*&rows=%s' % max_records)
+
+        response = urllib2.urlopen(request)
+
+        if response:
+            if response.code == 200:
+                # Use the json module to load CKAN's response into a dictionary.
+                response_dict = json.loads(response.read())
+                assert response_dict['success'] is True
+
+                return response_dict
+        return None
+
     def search(self):
         from ckan.lib.search import SearchError, SearchQueryError
 
@@ -80,6 +161,7 @@ class CustomPakcageController(PackageController):
 
         # unicode format (decoded from utf8)
         q = c.q = request.params.get('q', u'')
+        org = request.params.get('organization', None)
         c.query_error = False
         page = h.get_page_number(request.params)
 
@@ -165,7 +247,7 @@ class CustomPakcageController(PackageController):
             # types any search page. Potential alternatives are do show them
             # on the default search page (dataset) or on one other search page
             search_all_type = config.get(
-                                  'ckan.search.show_all_types', 'dataset')
+                'ckan.search.show_all_types', 'dataset')
             search_all = False
 
             try:
@@ -193,7 +275,7 @@ class CustomPakcageController(PackageController):
                 'tags': _('Tags'),
                 'res_format': _('Formats'),
                 'license_id': _('Licenses'),
-                }
+            }
 
             for facet in h.facets():
                 if facet in default_facet_titles:
@@ -224,21 +306,10 @@ class CustomPakcageController(PackageController):
             # loop the search query and get all the results
             # this workaround the 1000 rows solr hard limit
             HARD_LIMIT = 1000
-
-            # pager limit is to control the total geo points which are going to be plotted
-            # this is a performance tuner rather than actual limit
-            # Loading 1k to 3k points seems performant
-            # More than that will pose a problem at both server and client side
-            # On the server, it has to loop through all the points
-            # And on the client, javascript has to do all the acutal plot
-            if q:
-                PAGER_LIMIT = 10
-            else:
-                PAGER_LIMIT = 1
-
-            # crank up the pager limit high as using points cluster for better performance
-            PAGER_LIMIT = 1000
+            conn = get_connection_redis()
             pager = 0
+            # crank up the pager limit high as using points cluster for better performance
+            PAGER_LIMIT = 10000
 
             data_dict_full_result = {
                 'q': q,
@@ -252,27 +323,54 @@ class CustomPakcageController(PackageController):
                     'ckan.search.default_include_private', True)),
             }
 
-            query_full_result = get_action('package_search')(context, data_dict_full_result)
-
-            full_results = list()
-            while query_full_result.get('results', None) and pager < PAGER_LIMIT:
-                full_results.extend(query_full_result.get('results', None))
-
-                pager += 1
-
-                data_dict_full_result = {
-                    'q': q,
-                    'fq': fq.strip(),
-                    'facet.field': facets.keys(),
-                    'rows': HARD_LIMIT,
-                    'start': pager * HARD_LIMIT,
-                    'sort': sort_by,
-                    'extras': search_extras,
-                    'include_private': asbool(config.get(
-                        'ckan.search.default_include_private', True)),
-                }
-
-                query_full_result = get_action('package_search')(context, data_dict_full_result)
+            if not org:
+                # if no q, it is an init load or direct visit on / dataset
+                log.info('### Not org ###')
+                if not q:
+                    log.info('### Not q ###')
+                    if not conn.exists('redis_full_results'):
+                        log.info('### generating full results ###')
+                        # get full results and add to redis when there is not full results in redis
+                        full_results = self.get_full_results(context, data_dict_full_result, pager, PAGER_LIMIT, q,
+                                                             fq, facets, HARD_LIMIT, sort_by, search_extras)
+                        map_results = self.get_map_result(full_results)
+                        # adding to redis
+                        log.info('adding full results to redis')
+                        conn.set('redis_full_results', json.dumps(map_results))
+                        # log.info(c.full_results)
+                    else:
+                        log.info('### using cached full results ###')
+                        map_results = json.loads(conn.get('redis_full_results'))
+                        # log.info(c.full_results)
+                else:
+                    log.info('### With q ###')
+                    full_results = self.get_full_results(context, data_dict_full_result, pager, PAGER_LIMIT, q,
+                                                         fq, facets, HARD_LIMIT, sort_by, search_extras)
+                    map_results = self.get_map_result(full_results)
+            else:
+                log.info('### With org ###')
+                if not q:
+                    log.info('### Not q ###')
+                    if not conn.exists('redis_full_results_%s' % org):
+                        log.info('### generating %s results ###' % org)
+                        # get full results and add to redis when there is not full results in redis
+                        full_results = self.get_full_results(context, data_dict_full_result, pager, PAGER_LIMIT, q,
+                                                             fq, facets, HARD_LIMIT, sort_by, search_extras)
+                        map_results = self.get_map_result(full_results)
+                        # adding to redis
+                        log.info('adding %s results to redis' % org)
+                        conn.set('redis_full_results_%s' % org, json.dumps(map_results))
+                        # log.info(c.full_results)
+                    else:
+                        log.info('### using cached %s results ###' % org)
+                        map_results = json.loads(conn.get('redis_full_results_%s' % org))
+                        # log.info(c.full_results)
+                else:
+                    log.info('### With q ###')
+                    full_results = self.get_full_results(context, data_dict_full_result, pager, PAGER_LIMIT, q,
+                                                         fq, facets, HARD_LIMIT, sort_by, search_extras)
+                    map_results = self.get_map_result(full_results)
+                # log.info(c.full_results)
 
             c.sort_by_selected = query['sort']
 
@@ -285,7 +383,6 @@ class CustomPakcageController(PackageController):
             )
             c.search_facets = query['search_facets']
             c.page.items = query['results']
-            c.page.full_results = full_results
         except SearchQueryError as se:
             # User's search parameters are invalid, in such a way that is not
             # achievable with the web interface, so return a proper error to
@@ -308,15 +405,15 @@ class CustomPakcageController(PackageController):
         for facet in c.search_facets.keys():
             try:
                 limit = int(request.params.get('_%s_limit' % facet,
-                            int(config.get('search.facets.default', 10))))
+                                               int(config.get('search.facets.default', 10))))
             except ValueError:
                 abort(400, _('Parameter "{parameter_name}" is not '
                              'an integer').format(
-                      parameter_name='_%s_limit' % facet))
+                    parameter_name='_%s_limit' % facet))
             c.search_facets_limits[facet] = limit
 
         self._setup_template_variables(context, {},
                                        package_type=package_type)
 
         return render(self._search_template(package_type),
-                      extra_vars={'dataset_type': package_type})
+                      extra_vars={'dataset_type': package_type, 'map_results': map_results})

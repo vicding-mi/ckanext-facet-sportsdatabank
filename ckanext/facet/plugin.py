@@ -78,6 +78,12 @@ class FacetPlugin(plugins.SingletonPlugin):
             del facets_dict['groups']
             # facets_dict['groups'] = 'Communities'
             # del facets_dict['Communities']
+
+        if 'notes' in facets_dict:
+            facets_dict['notes_there'] = toolkit._('Notes is there')
+
+        facets_dict['anyway_there'] = toolkit._('Anyway there')
+
         # New facets
         # facets_dict['identifier'] = toolkit._('Identifier')
         # facets_dict['index'] = toolkit._('Index')
@@ -89,6 +95,8 @@ class FacetPlugin(plugins.SingletonPlugin):
 
         facets_dict['placeMentioned'] = toolkit._('Place Mentioned')
         facets_dict['placeOfNarration'] = toolkit._('Place of Narration')
+
+        # pprint(facets_dict)
         return facets_dict
 
     def update_config(self, config):
