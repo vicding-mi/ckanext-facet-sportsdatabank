@@ -51,6 +51,24 @@ def facet_capitalize(string):
     return string.capatalize
 
 
+def facet_orgcount(org_id):
+    request = urllib2.Request(
+        'http://ckan:5000/api/3/action/organization_show?id=%s' % org_id )
+    response = urllib2.urlopen(request)
+    assert response.code == 200
+
+    response_dict = json.loads(response.read())
+    if response_dict['success'] is True:
+        log.warning('%s has %s datasets' % (org_id, response_dict['result']['package_count']))
+        if response_dict['result']['package_count'] > 40000:
+            return 1
+        else:
+            return 2
+        return response_dict['result']['package_count']
+    else:
+        return 0
+
+
 class FacetPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IPackageController, inherit=True)
@@ -118,7 +136,7 @@ class FacetPlugin(plugins.SingletonPlugin):
         # other extensions.
         return {'facet_loadjson': facet_loadjson, 'facet_apisearch': facet_apisearch,
                 'facet_pprint': facet_pprint, 'facet_len': facet_len, 'facet_vars': facet_vars,
-                'facet_capitalize': facet_capitalize,
+                'facet_capitalize': facet_capitalize, 'facet_orgcount': facet_orgcount,
                 }
 
     def before_map(self, map):
