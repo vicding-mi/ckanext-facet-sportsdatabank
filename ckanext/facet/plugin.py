@@ -69,12 +69,28 @@ def facet_orgcount(org_id):
         return 0
 
 
+def no_registering(context, data_dict):
+    return {
+        'success': False,
+        'msg': plugins.toolkit._('Registration disabled. ')
+    }
+
+
 class FacetPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IPackageController, inherit=True)
+    plugins.implements(plugins.IAuthFunctions, inherit=True)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IRoutes, inherit=True)
+
+    def get_auth_functions(self):
+        return {
+            'user_create': no_registering
+        }
+
+    def update_config(self, config):
+        plugins.toolkit.add_template_directory(config, 'templates')
 
     def dataset_facets(self, facets_dict, package_type):
         return self._facets(facets_dict)
@@ -98,9 +114,7 @@ class FacetPlugin(plugins.SingletonPlugin):
             # del facets_dict['Communities']
 
         if 'notes' in facets_dict:
-            facets_dict['notes_there'] = toolkit._('Notes is there')
-
-        facets_dict['anyway_there'] = toolkit._('Anyway there')
+            facets_dict['notes'] = toolkit._('Notes')
 
         # New facets
         # facets_dict['identifier'] = toolkit._('Identifier')
@@ -149,6 +163,7 @@ class FacetPlugin(plugins.SingletonPlugin):
         """
         # Hook in our custom user controller at the points of creation
         # and edition.
+
         map.connect('/dataset',
                     controller='ckanext.facet.controller:CustomPakcageController',
                     action='search')
