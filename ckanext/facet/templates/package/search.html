@@ -33,7 +33,7 @@
 
         for (var i = 0; i < geosArray.length; i++) {
                 var a = geosArray[i];
-                var title = "<a href=\"" + a[3] + "\">"+a[2]+"</a>";
+                var title = "<a href=\"dataset\\" + a[3] + "\">"+a[2]+"</a>";
                 // var title = a[2];
                 var marker = L.marker(new L.LatLng(a[0], a[1]), { title: title });
                 marker.bindPopup(title);

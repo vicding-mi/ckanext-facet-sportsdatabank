@@ -129,8 +129,9 @@ class CustomPakcageController(PackageController):
                 if spatial['key'] == 'spatial':
                     markers = self.facet_loadjson(spatial['value'])
                     for geopoint in markers['coordinates']:
-                        map_results.append([geopoint[0], geopoint[1], r['name'], current_url])
-        # log.info(map_results)
+                        # map_results.append([geopoint[0], geopoint[1], r['name'], current_url])
+                        map_results.append([geopoint[0], geopoint[1], r['name'], r['name']])
+            # log.info('######################## {}'.format(r['name']))
         return map_results
 
     def get_all_packages(self, max_records=99999):
