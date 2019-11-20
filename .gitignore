@@ -46,3 +46,5 @@ venv/*
 
 .idea
 .idea/*
+
+**/.DS_Store
