@@ -18,12 +18,17 @@
                 <th scope="row" class="dataset-label" property="rdfs:label">{{ _('Narration place') }}</th>
                 <td class="dataset-details" property="rdf:value">{{ value }}</td>
             </tr> 
-            {% elif key == 'narrator' %}
+        {% elif key == 'narrator' %}
             <tr rel="dc:relation" resource="_:extra{{ i }}">
                 <th scope="row" class="dataset-label" property="rdfs:label">{{ _('Narrator') }}</th>
                 <td class="dataset-details" property="rdf:value">{{ value }}</td>
-            </tr> 
-            {% elif key == 'nl_keyword' or key == 'da_keyword' or key == 'de_keyword' %}
+            </tr>
+        {% elif key == 'narrator gender' %}
+            <tr rel="dc:relation" resource="_:extra{{ i }}">
+                <th scope="row" class="dataset-label" property="rdfs:label">{{ _('Narrator Gender') }}</th>
+                <td class="dataset-details" property="rdf:value">{{ value }}</td>
+            </tr>
+        {% elif key == 'nl_keyword' or key == 'da_keyword' or key == 'de_keyword' %}
             <tr rel="dc:relation" resource="_:extra{{ i }}">
                 <th scope="row" class="dataset-label" property="rdfs:label">{{ _('Keyword') }}</th>
                 <td class="dataset-details" property="rdf:value">{{ value }}</td>

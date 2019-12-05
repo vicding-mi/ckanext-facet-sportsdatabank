@@ -61,11 +61,11 @@ def get_connection_redis():
     try:
         import redis
     except Exception as e:
-        log.info('### cannot import redis ###')
+        log.error('Cannot import redis; Error is {}'.format(e.message))
     try:
         return redis.Redis(host=HOSTNAME)
     except Exception as e:
-        log.info('### cannot get redis connection ###')
+        log.error('Cannot get redis connection to host {}; error is {}'.format(HOSTNAME, e.message))
 
 
 def _encode_params(params):

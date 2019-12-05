@@ -127,6 +127,7 @@ class FacetPlugin(plugins.SingletonPlugin):
 
         facets_dict['placeMentioned'] = toolkit._('Place Mentioned')
         facets_dict['placeOfNarration'] = toolkit._('Place of Narration')
+        facets_dict['narratorgender'] = toolkit._('Narrator Gender')
 
         # pprint(facets_dict)
         return facets_dict
