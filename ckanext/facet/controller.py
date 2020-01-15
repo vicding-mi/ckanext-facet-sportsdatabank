@@ -90,23 +90,28 @@ class CustomPakcageController(PackageController):
 
     def get_full_results(self, context, data_dict_full_result, pager, PAGER_LIMIT, q, fq, facets, HARD_LIMIT, sort_by,
                          search_extras):
+        log.info('before loop: {}'.format(data_dict_full_result))
         query_full_result = get_action('package_search')(context, data_dict_full_result)
         full_results = list()
         while query_full_result.get('results', None) and pager < PAGER_LIMIT:
             full_results.extend(query_full_result.get('results', None))
             pager += 1
-            data_dict_full_result = {
-                'q': q,
-                'fq': fq.strip(),
-                'facet.field': facets.keys(),
-                'rows': HARD_LIMIT,
-                'start': pager * HARD_LIMIT,
-                'sort': sort_by,
-                'extras': search_extras,
-                'include_private': asbool(config.get(
-                    'ckan.search.default_include_private', True)),
-            }
+            # data_dict_full_result = {
+            #     'q': q,
+            #     'fq': fq.strip(),
+            #     'facet.field': facets.keys(),
+            #     'rows': HARD_LIMIT,
+            #     'start': pager * HARD_LIMIT,
+            #     'sort': sort_by,
+            #     'extras': search_extras,
+            #     'include_private': asbool(config.get(
+            #         'ckan.search.default_include_private', True)),
+            # }
+            data_dict_full_result['start'] = pager * HARD_LIMIT
+            log.info('in loop: {}'.format(data_dict_full_result))
             query_full_result = get_action('package_search')(context, data_dict_full_result)
+            log.info('result: {}'.format(query_full_result.get('results', None)))
+        log.info('full results: {}'.format(full_results))
         return full_results
 
     def facet_loadjson(self, orgstr, swap=True):
@@ -254,6 +259,7 @@ class CustomPakcageController(PackageController):
                 'ckan.search.show_all_types', 'dataset')
             search_all = False
 
+            map_results = None
             try:
                 # If the "type" is set to True or False, convert to bool
                 # and we know that no type was specified, so use traditional

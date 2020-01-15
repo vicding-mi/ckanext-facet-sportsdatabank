@@ -123,11 +123,11 @@ class FacetPlugin(plugins.SingletonPlugin):
         facets_dict['keyword'] = toolkit._('Keywords')
         facets_dict['da_keyword'] = toolkit._('Danish Keywords')
         facets_dict['nl_keyword'] = toolkit._('Dutch Keywords')
-        facets_dict['de_keyword'] = toolkit._('German Keywords')
+        facets_dict['deu_keyword'] = toolkit._('German Keywords')
 
         facets_dict['placeMentioned'] = toolkit._('Place Mentioned')
-        facets_dict['placeOfNarration'] = toolkit._('Place of Narration')
-        facets_dict['narratorgender'] = toolkit._('Narrator Gender')
+        facets_dict['place_narration'] = toolkit._('Place of Narration')
+        facets_dict['person_narrator_gender'] = toolkit._('Narrator Gender')
 
         # pprint(facets_dict)
         return facets_dict
