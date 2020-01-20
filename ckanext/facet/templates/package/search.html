@@ -1,7 +1,6 @@
 {% ckan_extends %}
 
 {% block primary_content %}
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet-src.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,41 +9,41 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.0/dist/MarkerCluster.Default.css" />
     <script src="https://unpkg.com/leaflet.markercluster@1.4.0/dist/leaflet.markercluster-src.js"></script>
 
-    <div id="map" style="height: 360px;"></div>
+    <div id="ckanext_facet_map_div" style="height: 360px;"></div>
 
     <script type="text/javascript">
 
-        var geosArray = [];
+        var ckanext_facet_geosArray = [];
         {% for r in map_results %}
-            geosArray.push([{{ r[0] }}, {{ r[1] }}, "{{r[2]}}", "{{r[3]}}"]);
+            ckanext_facet_geosArray.push([{{ r[0] }}, {{ r[1] }}, "{{r[2]}}", "{{r[3]}}"]);
         {% endfor %}
 
-        var tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        var ckanext_facet_tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         maxZoom: 18,
                         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Points &copy 2019 LINZ'
                 }),
-                latlng = L.latLng(52.3745403,4.89797550561798);
+                ckanext_facet_latlng = L.latLng(52.3745403,4.89797550561798);
 
-        var map = L.map('map', {center: latlng, zoom: 5, layers: [tiles]});
+        var ckanext_facet_map = L.map('ckanext_facet_map_div', {center: ckanext_facet_latlng, zoom: 5, layers: [ckanext_facet_tiles]});
 
-        var markers = L.markerClusterGroup({
+        var ckanext_facet_markers = L.markerClusterGroup({
             maxClusterRadius: 30
         });
 
-        for (var i = 0; i < geosArray.length; i++) {
-                var a = geosArray[i];
+        for (var i = 0; i < ckanext_facet_geosArray.length; i++) {
+                var a = ckanext_facet_geosArray[i];
                 var title = "<a href=\"dataset\\" + a[3] + "\">"+a[2]+"</a>";
                 // var title = a[2];
                 var marker = L.marker(new L.LatLng(a[0], a[1]), { title: title });
                 marker.bindPopup(title);
-                markers.addLayer(marker);
+                ckanext_facet_markers.addLayer(marker);
         }
 
-        map.addLayer(markers);
-        geosArray = null;
-        markers = null;
+        ckanext_facet_map.addLayer(ckanext_facet_markers);
+        ckanext_facet_geosArray = null;
+        ckanext_facet_markers = null;
         window.onbeforeunload = function(){
-            map = null;
+            ckanext_facet_map = null;
             return null;
         };
         </script>
@@ -55,7 +54,7 @@
 
 {% endblock %}
 
-{% block secondary_content %}
-    {% snippet 'spatial/snippets/spatial_query.html' %}
-    {{ super() }}
-{% endblock %}
+{#{% block secondary_content %}#}
+{#    {% snippet 'spatial/snippets/spatial_query.html' %}#}
+{#    {{ super() }}#}
+{#{% endblock %}#}
