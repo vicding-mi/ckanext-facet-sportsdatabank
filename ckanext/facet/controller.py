@@ -111,7 +111,7 @@ class CustomPakcageController(PackageController):
             log.info('in loop: {}'.format(data_dict_full_result))
             query_full_result = get_action('package_search')(context, data_dict_full_result)
             log.info('result: {}'.format(query_full_result.get('results', None)))
-        log.info('full results: {}'.format(full_results))
+        # log.info('full results: {}'.format(full_results))
         return full_results
 
     def facet_loadjson(self, orgstr, swap=True):
