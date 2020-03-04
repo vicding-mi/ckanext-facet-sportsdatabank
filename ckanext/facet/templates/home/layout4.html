@@ -1,0 +1,23 @@
+<div class="hcContentContainer">
+    <div class="hcMarginBottom2 hcBasicSideMargin hcIsHome">
+        <div>
+            <p class="hcMarginBottom2">ISEBEL is a collection of orally transmitted legends: traditional stories about
+                <a href="">ghosts</a>, <a href="">hauntings</a>, <a href="">devils</a>, <a href="">witches</a>, <a
+                        href="">wizards</a>, <a href="">spells</a>, <a
+                        href="">werewolves</a>, <a href="">nightmares</a>, <a href="">giants</a>, <a href="">trolls</a>,
+                <a href="">goblins</a> and the like, as well as stories about <a href="">hidden treasures</a>, <a
+                        href="">famous robbers</a>, <a
+                        href="">underground passages</a> and <a href="">sunken castles</a>.</p>
+
+
+            <form class="section site-search simple-input" action="{% url_for controller='package', action='search' %}"
+                  method="get">
+                <div class="hcFacetSearch hcMarginBottom1">
+                    <input id="field-sitewide-search" class="form-control" name="q" type="text" name="" value="" placeholder="{{ _('Search') }}" />
+                    <button type="submit" name="button" class="btn-search"><i class="fa fa-search"></i></button>
+                </div>
+                {#            <p>Or go directly to <a href="">the search page</a>...</p>#}
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,11 +1,79 @@
+from ckan.common import config
+from ckan.lib import helpers as h
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import logging
 import json
 import urllib2
+import copy
 from pprint import pprint
 
 log = logging.getLogger(__name__)
+
+def facet_get_extra_data_field(extras, field, lang=False):
+    if not extras:
+        return None
+
+    extras_list = extras
+    if extras_list and isinstance(extras_list, list):
+        if lang:
+            for item_dict in extras_list:
+                k = item_dict.get('key').encode('utf-8')
+                v = item_dict.get('value').encode('utf-8')
+                if field in k:
+                    return k, v
+        else:
+            for item_dict in extras_list:
+                k = item_dict.get('key').encode('utf-8')
+                v = item_dict.get('value').encode('utf-8')
+                if k == field:
+                    return k, v
+    return None
+
+def facet_build_nav_main(*args):
+    ''' build a set of menu items.
+
+    args: tuples of (menu type, title) eg ('login', _('Login'))
+    outputs <li><a href="...">title</a></li>
+    '''
+    output = ''
+    for item in args:
+        menu_item, title = item[:2]
+        if len(item) == 3 and not h.check_access(item[2]):
+            continue
+        output += _make_menu_item(menu_item, title, class_='hcIsNav')
+    return output
+
+def _make_menu_item(menu_item, title, **kw):
+    ''' build a navigation item used for example breadcrumbs
+
+    outputs <li><a href="..."></i> title</a></li>
+
+    :param menu_item: the name of the defined menu item defined in
+    config/routing as the named route of the same name
+    :type menu_item: string
+    :param title: text used for the link
+    :type title: string
+    :param **kw: additional keywords needed for creating url eg id=...
+
+    :rtype: HTML literal
+
+    This function is called by wrapper functions.
+    '''
+    menu_item = h.map_pylons_to_flask_route_name(menu_item)
+    _menu_items = config['routes.named_routes']
+    if menu_item not in _menu_items:
+        raise Exception('menu item `%s` cannot be found' % menu_item)
+    item = copy.copy(_menu_items[menu_item])
+    item.update(kw)
+    needed = item.pop('needed')
+    # log.debug('Items is: {}'.format(item))
+    for need in needed:
+        if need not in kw:
+            raise Exception('menu item `%s` need parameter `%s`'
+                            % (menu_item, need))
+    link = h._link_to(title, menu_item, suppress_active_class=True, **item)
+    return link
 
 def facet_loadjson(orgstr, swap=True):
     '''return json obj'''
@@ -16,6 +84,11 @@ def facet_loadjson(orgstr, swap=True):
         else:
             json_data['coordinates'] = map(lambda x: list(reversed(x)), reversed(json_data['coordinates']))
     return json_data
+
+def facet_dumpjson(orgstr):
+    return json.dumps(orgstr)
+
+# def facet_nl2br(orgstr):
 
 
 def facet_apisearch(q='', rows=99999):
@@ -40,7 +113,7 @@ def facet_pprint(obj):
 
 
 def facet_len(obj):
-    return len(obj)
+        return len(obj) if obj else 0
 
 
 def facet_vars(obj):
@@ -72,7 +145,7 @@ def facet_orgcount(org_id):
 def no_registering(context, data_dict):
     return {
         'success': False,
-        'msg': plugins.toolkit._('Registration disabled. ')
+        'msg': toolkit._('Registration disabled. ')
     }
 
 
@@ -88,9 +161,6 @@ class FacetPlugin(plugins.SingletonPlugin):
         return {
             'user_create': no_registering
         }
-
-    def update_config(self, config):
-        plugins.toolkit.add_template_directory(config, 'templates')
 
     def dataset_facets(self, facets_dict, package_type):
         return self._facets(facets_dict)
@@ -142,6 +212,7 @@ class FacetPlugin(plugins.SingletonPlugin):
         # plugin.py file.
         toolkit.add_template_directory(config, 'templates')
         toolkit.add_resource('fanstatic', 'facet')
+        toolkit.add_public_directory(config, 'public')
 
     def get_helpers(self):
         '''Register the most_popular_groups() function above as a template
@@ -154,6 +225,8 @@ class FacetPlugin(plugins.SingletonPlugin):
         return {'facet_loadjson': facet_loadjson, 'facet_apisearch': facet_apisearch,
                 'facet_pprint': facet_pprint, 'facet_len': facet_len, 'facet_vars': facet_vars,
                 'facet_capitalize': facet_capitalize, 'facet_orgcount': facet_orgcount,
+                'facet_build_nav_main': facet_build_nav_main, 'facet_dumpjson': facet_dumpjson,
+                'facet_get_extra_data_field': facet_get_extra_data_field
                 }
 
     def before_map(self, map):
