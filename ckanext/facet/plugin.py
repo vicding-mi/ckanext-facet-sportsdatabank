@@ -210,9 +210,9 @@ class FacetPlugin(plugins.SingletonPlugin):
         # that CKAN will use this plugin's custom templates.
         # 'templates' is the path to the templates dir, relative to this
         # plugin.py file.
+        toolkit.add_public_directory(config, 'public')
         toolkit.add_template_directory(config, 'templates')
         toolkit.add_resource('fanstatic', 'facet')
-        toolkit.add_public_directory(config, 'public')
 
     def get_helpers(self):
         '''Register the most_popular_groups() function above as a template

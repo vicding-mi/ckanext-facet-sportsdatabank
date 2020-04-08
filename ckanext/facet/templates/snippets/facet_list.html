@@ -55,17 +55,19 @@ within_tertiary
               <span>{{ title }}</span>
 {#              <span class="hcIconHelp"><img src="https://d33wubrfki0l68.cloudfront.net/85886ca3e2d8c36ba06d7773a094512272453181/545f8/images/icons/icon-huc-help.svg" alt="{{ _('Help') }}"></span>#}
             </div>
-            <div class="hcFacetHelp">
-              <strong>Filter results using facet </strong><br>
-                Please note that the content is organised by archive folder. This may affect your results. Learn more about the structure of the archive.
-            </div>
-              <div class="hcFacetFilter"><input type="text" name="" value="" placeholder="Type to filter" /></div>
+{#            <div class="hcFacetHelp">#}
+{#              <strong>Filter results using facet </strong><br>#}
+{#                Please note that the content is organised by archive folder. This may affect your results. Learn more about the structure of the archive.#}
+{#            </div>#}
+            <div class="hcFacetFilter"><input id="filter_search_{{ title.lower() }}" type="text" name="" value="" placeholder="Type to filter" /></div>
           {% endblock %}
           {% block facet_list_items %}
             {% with items = items or h.get_facet_items_dict(name) %}
             {% if items %}
+
+              {% for item in items %}
+{#                  {{ item }}#}
                 <div class="{{ nav_class or 'hcFacetItems' }}">
-                  {% for item in items %}
                     {% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}
                     {% set label = label_function(item) if label_function else item.display_name %}
                     {% set label_truncated = h.truncate(label, 22) if not label_function else label %}
@@ -78,8 +80,9 @@ within_tertiary
                           <span class="hcFacetCount">{{ count }}</span>
                         </a>
                       </div>
-                  {% endfor %}
                 </div>
+              {% endfor %}
+
 
 {#              <p class="module-footer">#}
                 {% if h.get_param_int('_%s_limit' % name) %}
