@@ -30,6 +30,21 @@ def facet_get_extra_data_field(extras, field, lang=False):
                     return k, v
     return None
 
+def facet_get_similar_fields_from_extras(extras, field):
+    result = list()
+    if not extras:
+        return None
+
+    extras_list = extras
+    if extras_list and isinstance(extras_list, list):
+        for item_dict in extras_list:
+            k = item_dict.get('key').encode('utf-8')
+            v = item_dict.get('value').encode('utf-8')
+            if field in k:
+                result.append((k, v))
+        return result
+    return None
+
 def facet_build_nav_main(*args):
     ''' build a set of menu items.
 
@@ -226,7 +241,8 @@ class FacetPlugin(plugins.SingletonPlugin):
                 'facet_pprint': facet_pprint, 'facet_len': facet_len, 'facet_vars': facet_vars,
                 'facet_capitalize': facet_capitalize, 'facet_orgcount': facet_orgcount,
                 'facet_build_nav_main': facet_build_nav_main, 'facet_dumpjson': facet_dumpjson,
-                'facet_get_extra_data_field': facet_get_extra_data_field
+                'facet_get_extra_data_field': facet_get_extra_data_field,
+                'facet_get_similar_fields_from_extras': facet_get_similar_fields_from_extras
                 }
 
     def before_map(self, map):

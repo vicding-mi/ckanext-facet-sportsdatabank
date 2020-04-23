@@ -77,6 +77,17 @@
               <strong>{% if v %} {{ v.decode('utf-8').strip().capitalize() }} {% endif %}&nbsp;</strong>
             </div>
 
+
+            {% set keywords = h.facet_get_similar_fields_from_extras(pkg.extras, 'keyword_') %}
+            <div>Keywords:
+                {% for keyword in keywords %}
+                    {% set k, v = keyword %}
+                    <div class="hcLabel">{{ _(k) }}</div>
+                    <div>{{ v }}</div>
+                {% endfor %}
+
+            </div>
+
             <div class="hcColumnsEqual">
               {% set key, keywords = h.facet_get_extra_data_field(pkg.extras, 'keyword', True) if h.facet_get_extra_data_field(pkg.extras, 'keyword', True) else (None, None) %}
               {% set keywords = keywords.split(';') if keywords else [] %}
@@ -87,6 +98,17 @@
                 </div>
               {% endfor %}
             </div>
+
+            {% set persons = h.facet_get_similar_fields_from_extras(pkg.extras, 'person_') %}
+            <div>Persons:
+                {% for person in persons %}
+                    {% set k, v = person %}
+                    <div class="hcLabel">{{ _(k) }}</div>
+                    <div>{{ v }}</div>
+                {% endfor %}
+
+            </div>
+
             {% set person_key, person_value = h.facet_get_extra_data_field(pkg.extras, 'person_narrator') if h.facet_get_extra_data_field(pkg.extras, 'person_narrator') else (None, None) %}
             {% if person_value %}
                 <div>
@@ -106,6 +128,18 @@
             <div>
               <div class="hcLabel">{{ _('Tale type') }}</div>
               <div>{% if tale_type_value %} {{ tale_type_value.decode('utf-8') }}{% endif %}&nbsp;</div>
+            </div>
+
+
+
+            {% set places = h.facet_get_similar_fields_from_extras(pkg.extras, 'place_') %}
+            <div>Places: 
+                {% for place in places %}
+                    {% set k, v = place %}
+                    <div class="hcLabel">{{ _(k) }}</div>
+                    <div>{{ v }}</div>
+                {% endfor %}
+
             </div>
 
             {% set place_narration_key, place_narration_value = h.facet_get_extra_data_field(pkg.extras, 'place_narration') if h.facet_get_extra_data_field(pkg.extras, 'place_narration') else (None, None) %}

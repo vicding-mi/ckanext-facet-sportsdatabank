@@ -31,16 +31,21 @@ Example:
         {% endblock %}
 
         <div class="hcItemsStretch hcSmallTxt">
-        <div class="hcColumnsEqual">
-          {% set key, keywords = h.facet_get_extra_data_field(package.extras, 'keyword', True) if h.facet_get_extra_data_field(package.extras, 'keyword', True) else (None, None) %}
-          {% set keywords = keywords.split(';') if keywords else [] %}
-          {% for keyword in keywords[:7] %}
-            <div class="hcIsTags"><img alt="Keyword: {{ keyword.decode('utf-8').strip() }}" src="https://d33wubrfki0l68.cloudfront.net/fb601fac0a70dc030111b00f4dd3ee7fc84458b3/6d759/images/icons/icon-tag.png" class="hcTag"><a href="{{ h.add_url_param(new_params={key.decode('utf-8'): keyword.decode('utf-8').strip()}) }}"> {{ keyword.decode('utf-8').strip() }}</a></div>
-          {% endfor %}
-          {% if h.facet_len(keywords) > 7 %}
-            <div>more ... </div>
-          {% endif %}
-        </div>
+        {% if c.controller %}
+            <div class="hcColumnsEqual">
+              {% set key, keywords = h.facet_get_extra_data_field(package.extras, 'keyword', True) if h.facet_get_extra_data_field(package.extras, 'keyword', True) else (None, None) %}
+              {% set keywords = keywords.split(';') if keywords else [] %}
+              {% for keyword in keywords[:7] %}
+                <div class="hcIsTags">
+                    <img alt="Keyword: {{ keyword.decode('utf-8').strip() }}" src="https://d33wubrfki0l68.cloudfront.net/fb601fac0a70dc030111b00f4dd3ee7fc84458b3/6d759/images/icons/icon-tag.png" class="hcTag">
+                    <a href="{{ h.add_url_param(new_params={key.decode('utf-8'): keyword.decode('utf-8').strip()}) }}"> {{ keyword.decode('utf-8').strip() }}</a>
+                </div>
+              {% endfor %}
+              {% if h.facet_len(keywords) > 7 %}
+                <div>more ... </div>
+              {% endif %}
+            </div>
+        {% endif %}
         <div>
             {% block heading_title %}
 {#              {{ h.link_to(h.truncate(title, truncate_title), h.url_for(package.type + '_read', controller='package', action='read', id=package.name)) }}#}
