@@ -133,7 +133,7 @@
 
 
             {% set places = h.facet_get_similar_fields_from_extras(pkg.extras, 'place_') %}
-            <div>Places: 
+            <div>Places:
                 {% for place in places %}
                     {% set k, v = place %}
                     <div class="hcLabel">{{ _(k) }}</div>
