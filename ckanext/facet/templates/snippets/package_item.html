@@ -38,7 +38,7 @@ Example:
               {% for keyword in keywords[:7] %}
                 <div class="hcIsTags">
                     <img alt="Keyword: {{ keyword.decode('utf-8').strip() }}" src="https://d33wubrfki0l68.cloudfront.net/fb601fac0a70dc030111b00f4dd3ee7fc84458b3/6d759/images/icons/icon-tag.png" class="hcTag">
-                    <a href="{{ h.add_url_param(new_params={key.decode('utf-8'): keyword.decode('utf-8').strip()}) }}"> {{ keyword.decode('utf-8').strip() }}</a>
+                    <a href="{{ h.add_url_param(h.url_for(controller='package', action='search'), new_params={key.decode('utf-8'): keyword.decode('utf-8').strip()}) }}"> {{ keyword.decode('utf-8').strip() }}</a>
                 </div>
               {% endfor %}
               {% if h.facet_len(keywords) > 7 %}
