@@ -82,8 +82,8 @@
             <div>Keywords:
                 {% for keyword in keywords %}
                     {% set k, v = keyword %}
-                    <div class="hcLabel">{{ _(k) }}</div>
-                    <div>{{ v }}</div>
+                    <div class="hcLabel">{{ _(k.decode('utf-8')) }}</div>
+                    <div>{{ v.decode('utf-8') }}</div>
                 {% endfor %}
 
             </div>
