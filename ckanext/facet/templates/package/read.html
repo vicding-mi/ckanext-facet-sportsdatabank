@@ -104,7 +104,7 @@
                 {% for person in persons %}
                     {% set k, v = person %}
                     <div class="hcLabel">{{ _(k) }}</div>
-                    <div>{{ v }}</div>
+                    <div>{{ v.decode('utf-8') }}</div>
                 {% endfor %}
 
             </div>
