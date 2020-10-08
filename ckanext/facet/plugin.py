@@ -10,6 +10,7 @@ from pprint import pprint
 
 log = logging.getLogger(__name__)
 
+
 def facet_get_extra_data_field(extras, field, lang=False):
     if not extras:
         return None
@@ -30,6 +31,7 @@ def facet_get_extra_data_field(extras, field, lang=False):
                     return k, v
     return None
 
+
 def facet_get_similar_fields_from_extras(extras, field):
     result = list()
     if not extras:
@@ -45,6 +47,7 @@ def facet_get_similar_fields_from_extras(extras, field):
         return result
     return None
 
+
 def facet_build_nav_main(*args):
     ''' build a set of menu items.
 
@@ -58,6 +61,7 @@ def facet_build_nav_main(*args):
             continue
         output += _make_menu_item(menu_item, title, class_='hcIsNav')
     return output
+
 
 def _make_menu_item(menu_item, title, **kw):
     ''' build a navigation item used for example breadcrumbs
@@ -90,6 +94,7 @@ def _make_menu_item(menu_item, title, **kw):
     link = h._link_to(title, menu_item, suppress_active_class=True, **item)
     return link
 
+
 def facet_loadjson(orgstr, swap=True):
     '''return json obj'''
     json_data = json.loads(orgstr)
@@ -99,6 +104,7 @@ def facet_loadjson(orgstr, swap=True):
         else:
             json_data['coordinates'] = map(lambda x: list(reversed(x)), reversed(json_data['coordinates']))
     return json_data
+
 
 def facet_dumpjson(orgstr):
     return json.dumps(orgstr)
@@ -185,38 +191,28 @@ class FacetPlugin(plugins.SingletonPlugin):
         return self._facets(facets_dict)
 
     def _facets(self, facets_dict):
-        # Deleted facets
+        # Deleted some default facets
         if 'license_id' in facets_dict:
             del facets_dict['license_id']
         if 'res_format' in facets_dict:
             del facets_dict['res_format']
         if 'tags' in facets_dict:
             del facets_dict['tags']
-        # Renamed facets
         if 'groups' in facets_dict:
             del facets_dict['groups']
-            # facets_dict['groups'] = 'Communities'
-            # del facets_dict['Communities']
 
+        # Rename some default facets
         if 'notes' in facets_dict:
             facets_dict['notes'] = toolkit._('Notes')
 
-        # New facets
-        # facets_dict['identifier'] = toolkit._('Identifier')
-        # facets_dict['index'] = toolkit._('Index')
-
+        # Create custom facets
+        ''' TODO: Add custom facet here
+        It is adding ISEBEL facets now, should be adapted. 
+        The command to add facets:
+        facets_dict[facet_machine_name] = toolkit._(Facet Display Name)
+        '''
         facets_dict['keyword'] = toolkit._('Keywords')
-        facets_dict['da_keyword'] = toolkit._('Danish Keywords')
-        facets_dict['nl_keyword'] = toolkit._('Dutch Keywords')
-        facets_dict['deu_keyword'] = toolkit._('German Keywords')
 
-        facets_dict['placeMentioned'] = toolkit._('Place Mentioned')
-        facets_dict['place_narration'] = toolkit._('Place of Narration')
-        facets_dict['person_narrator_gender'] = toolkit._('Narrator Gender')
-
-        # facets_dict['machine_translation_target'] = toolkit._('Translation in English')
-
-        # pprint(facets_dict)
         return facets_dict
 
     def update_config(self, config):
@@ -230,10 +226,6 @@ class FacetPlugin(plugins.SingletonPlugin):
         toolkit.add_resource('fanstatic', 'facet')
 
     def get_helpers(self):
-        '''Register the most_popular_groups() function above as a template
-        helper function.
-
-        '''
         # Template helper function names should begin with the name of the
         # extension they belong to, to avoid clashing with functions from
         # other extensions.
@@ -247,7 +239,7 @@ class FacetPlugin(plugins.SingletonPlugin):
 
     def before_map(self, map):
         """This IRoutes implementation overrides the standard
-        ``/user/register`` behaviour with a custom controller.  You
+        ``/dataset`` behaviour with a custom controller.  You
         might instead use it to provide a completely new page, for
         example.
         Note that we have also provided a custom register form
@@ -256,16 +248,14 @@ class FacetPlugin(plugins.SingletonPlugin):
         # Hook in our custom user controller at the points of creation
         # and edition.
 
-        map.connect('/dataset',
-                    controller='ckanext.facet.controller:CustomPakcageController',
-                    action='search')
-        # map.connect('/user/edit',
-        #             controller='ckanext.example.controller:CustomUserController',
-        #             action='edit')
-        # map.connect('/user/edit/{id:.*}',
-        #             controller='ckanext.example.controller:CustomUserController',
-        #             action='edit')
+        ######### map function ############
+        # this code is to show the map with all datasets #
+        # if we have geolocation or geotags, a map can be plotted using this controller #
+        # It hooks into CKAN replace its default controller and replace with custom controller which is defined
+        # in the controller.py
 
-        # map.connect('/package/new', controller='package_formalchemy', action='new')
-        # map.connect('/package/edit/{id}', controller='package_formalchemy', action='edit')
+        # map.connect('/dataset',
+        #             controller='ckanext.facet.controller:CustomPakcageController',
+        #             action='search')
+
         return map

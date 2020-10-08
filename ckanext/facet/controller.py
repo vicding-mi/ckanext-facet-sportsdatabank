@@ -96,22 +96,8 @@ class CustomPakcageController(PackageController):
         while query_full_result.get('results', None) and pager < PAGER_LIMIT:
             full_results.extend(query_full_result.get('results', None))
             pager += 1
-            # data_dict_full_result = {
-            #     'q': q,
-            #     'fq': fq.strip(),
-            #     'facet.field': facets.keys(),
-            #     'rows': HARD_LIMIT,
-            #     'start': pager * HARD_LIMIT,
-            #     'sort': sort_by,
-            #     'extras': search_extras,
-            #     'include_private': asbool(config.get(
-            #         'ckan.search.default_include_private', True)),
-            # }
             data_dict_full_result['start'] = pager * HARD_LIMIT
-            # log.info('in loop: {}'.format(data_dict_full_result))
             query_full_result = get_action('package_search')(context, data_dict_full_result)
-            # log.info('result: {}'.format(query_full_result.get('results', None)))
-        # log.info('full results: {}'.format(full_results))
         return full_results
 
     def facet_loadjson(self, orgstr, swap=True):
@@ -134,9 +120,7 @@ class CustomPakcageController(PackageController):
                 if spatial['key'] == 'spatial':
                     markers = self.facet_loadjson(spatial['value'])
                     for geopoint in markers['coordinates']:
-                        # map_results.append([geopoint[0], geopoint[1], r['name'], current_url])
                         map_results.append([geopoint[0], geopoint[1], r['name'], r['name']])
-            # log.info('######################## {}'.format(r['name']))
         return map_results
 
     def get_all_packages(self, max_records=99999):
