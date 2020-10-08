@@ -1,17 +1,5 @@
 {% ckan_extends %}
 
-{% block breadcrumb %}
-    {% if self.breadcrumb_content() | trim %}
-         <div class="hcBreadCrumb hcMarginBottom2 hcBasicSideMargin hcTxtColorGreyMid hcSmallTxt">
-            {% snippet 'snippets/home_breadcrumb_item.html' %}
-            <span /> /
-            {% block breadcrumb_content %}
-                {{ h.nav_link(_(dataset_type.title() + 's'), controller='package', action='search', named_route=dataset_type + '_search', highlight_actions = 'new index') }}
-            {% endblock %}
-         </div>
-    {% endif %}
-{% endblock %}
-
 {% block primary_content %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet-src.js"></script>
@@ -67,31 +55,3 @@
 
 
 {% endblock %}
-
-{% block secondary %}
-  <div class="col-sm-3 hcLayoutFacets hcMarginBottom2 colorBgGreyLight hcBasicSideMargin">
-    {% block secondary_content %}
-        <div class="filters hcLayoutFacetsToggel hcMarginTop2" id="hcLayoutFacetsToggel">
-{#        {% snippet 'spatial/snippets/spatial_query.html' %}#}
-          <div>
-            {% for facet in c.facet_titles %}
-              {{ h.snippet('snippets/facet_list.html', title=c.facet_titles[facet], name=facet) }}
-            {% endfor %}
-          </div>
-          <a class="close no-text hide-filters"><i class="fa fa-times-circle"></i><span class="text">close</span></a>
-        </div>
-    {% endblock %}
-  </div>
-{% endblock %}
-
-    {% block page_pagination %}
-      {{ c.page.pager(q=c.q) }}
-    {% endblock %}
-
-      {% block package_search_results_api_inner %}
-      {% endblock %}
-
-{#{% block secondary_content %}#}
-{#    {% snippet 'spatial/snippets/spatial_query.html' %}#}
-{#    {{ super() }}#}
-{#{% endblock %}#}
