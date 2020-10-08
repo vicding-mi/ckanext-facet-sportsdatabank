@@ -1,6 +1,7 @@
 {% ckan_extends %}
 
 {% block primary_content %}
+<!--TODO: use fanstatic resource instead of loading over intenet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet-src.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
 
     <div id="ckanext_facet_map_div" class="hcMapPlaceholder" style="height: 360px;"></div>
 
+<!--TODO: move the JS code to fanstatic JS file and use as resource here-->
     <script type="text/javascript">
 
         var ckanext_facet_geosArray = [];
